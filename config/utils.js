@@ -5,7 +5,12 @@
  * @Author: John.Guan 
  * @Date: 2018-12-18 17:08:24 
  * @Last Modified by: John.Guan
- * @Last Modified time: 2018-12-18 17:18:24
+ * @Last Modified time: 2018-12-18 18:50:02
+ */
+
+/**
+ * 相对于单页应用
+ * 这个文件，都是新增的
  */
 
 const fs = require('fs')
@@ -65,6 +70,7 @@ const getEntriesDev = () => {
   for (let name in entries) {
     entry[name] = [
       require.resolve('./polyfills'),
+      'react-hot-loader/patch',
       require.resolve('react-dev-utils/webpackHotDevClient'),
       entries[name],
     ]
