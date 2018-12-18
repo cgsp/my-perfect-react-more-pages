@@ -1,3 +1,5 @@
+'use strict'
+
 const autoprefixer = require('autoprefixer')
 const path = require('path')
 const webpack = require('webpack')
@@ -10,6 +12,12 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter')
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
 const paths = require('./paths')
 const getClientEnvironment = require('./env')
+
+/**
+ * 相对于单页应用
+ * 新增utils方法
+ */
+const utils = require('./utils')
 
 // 覆盖ant-mobile主题
 const resetAntdTheme = require('../reset-antd-theme.json')
@@ -28,6 +36,11 @@ const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false'
 const publicUrl = publicPath.slice(0, -1)
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl)
+
+// 是否删除debugger
+const isDropDebugger = process.env.REACT_APP_BUILD_ENV === 'production' ? true : false
+// 是否删除console
+const isDropConsole = process.env.REACT_APP_BUILD_ENV === 'production' ? true : false
 
 // Assert this just to be safe.
 // Development builds of React are slow and not intended for production.
@@ -60,7 +73,8 @@ module.exports = {
   devtool: false,
   // In production, we only want to load the polyfills and the app code.
   // entry: [require.resolve('./polyfills'), paths.appIndexJs],
-  entry: {
+  // 相对于单页应用-修改
+  entry: Object.assign({}, {
     vendor: [
       'antd',
       'axios',
@@ -75,20 +89,39 @@ module.exports = {
       'react-dom',
       'react-router-dom',
     ],
-    app: [
-      require.resolve('./polyfills'),
-      paths.appIndexJs,
-    ],
   },
+    // 改动后:入口会自动扫描生成,直接在src/views/目录下新建入口js文件即可
+    utils.getEntriesProd()
+  ),
+  // entry: {
+  //   vendor: [
+  //     'antd',
+  //     'axios',
+  //     'js-cookie',
+  //     'good-storage',
+  //     'mobx',
+  //     'mobx-react',
+  //     'moment',
+  //     'qs',
+  //     'querystring',
+  //     'react',
+  //     'react-dom',
+  //     'react-router-dom',
+  //   ],
+  //   app: [
+  //     require.resolve('./polyfills'),
+  //     paths.appIndexJs,
+  //   ],
+  // },
   output: {
     // The build folder.
     path: paths.appBuild,
     // Generated JS file names (with nested folders).
     // There will be one main bundle, and one file per asynchronous chunk.
     // We don't currently advertise code splitting but Webpack supports it.
-    filename: 'static/js/[name].[chunkhash:8].js',
+    filename: 'static/js/[name].[chunkhash:12].js',
     // filename: 'static/js/[name].js',
-    chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
+    chunkFilename: 'static/js/[name].[chunkhash:12].chunk.js',
     // chunkFilename: 'static/js/[name].chunk.js',
     // We inferred the "public path" (such as / or /my-project) from homepage.
     publicPath: publicPath,
@@ -132,6 +165,7 @@ module.exports = {
       '@Router': path.join(__dirname, '..', 'src/router'),
       '@Store': path.join(__dirname, '..', 'src/store'),
       '@Utils': path.join(__dirname, '..', 'src/utils'),
+      '@Views': path.join(__dirname, '..', 'src/views'),
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -178,7 +212,7 @@ module.exports = {
             loader: require.resolve('url-loader'),
             options: {
               limit: 10000,
-              name: 'static/media/[name].[ext]'
+              name: 'static/media/[name].[hash:12].[ext]'
             }
           },
           // Process JS with Babel.
@@ -401,7 +435,7 @@ module.exports = {
             // by webpacks internal loaders.
             exclude: [/\.(js|jsx|mjs)$/, /\.html$/, /\.json$/],
             options: {
-              name: 'static/media/[name].[ext]'
+              name: 'static/media/[name].[hash:12].[ext]'
             }
           }
           // ** STOP ** Are you adding a new loader?
@@ -411,6 +445,12 @@ module.exports = {
     ]
   },
   plugins: [
+    // 自动加载模块，而不必到处 import 或 require.
+    new webpack.ProvidePlugin({
+      React: 'react',
+      ReactDOM: 'react-dom',
+      PropTypes: 'prop-types',
+    }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
@@ -418,22 +458,43 @@ module.exports = {
     // in `package.json`, in which case it will be the pathname of that URL.
     new InterpolateHtmlPlugin(env.raw),
     // Generates an `index.html` file with the <script> injected.
-    new HtmlWebpackPlugin({
-      inject: true,
-      template: paths.appHtml,
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true
-      }
-    }),
+    // 相对于单页应用-修改
+    // 自动扫描html模版,生成new HtmlWebpackPlugin()配置
+    ...utils.getHtmlWebpackPluginsProd(),
+    // new HtmlWebpackPlugin({
+    //   inject: true,
+    //   chunks: ['manifest', 'vendor', 'index'],
+    //   template: paths.appHtml,
+    //   filename: 'index.html',
+    //   minify: {
+    //     removeComments: true,
+    //     collapseWhitespace: true,
+    //     removeRedundantAttributes: true,
+    //     useShortDoctype: true,
+    //     removeEmptyAttributes: true,
+    //     removeStyleLinkTypeAttributes: true,
+    //     keepClosingSlash: true,
+    //     minifyJS: true,
+    //     minifyCSS: true,
+    //     minifyURLs: true,
+    //   },
+    // }),
+    // new HtmlWebpackPlugin({
+    //   inject: true,
+    //   template: paths.appHtml,
+    //   minify: {
+    //     removeComments: true,
+    //     collapseWhitespace: true,
+    //     removeRedundantAttributes: true,
+    //     useShortDoctype: true,
+    //     removeEmptyAttributes: true,
+    //     removeStyleLinkTypeAttributes: true,
+    //     keepClosingSlash: true,
+    //     minifyJS: true,
+    //     minifyCSS: true,
+    //     minifyURLs: true
+    //   }
+    // }),
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
     // It is absolutely essential that NODE_ENV was set to production here.
@@ -443,8 +504,8 @@ module.exports = {
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false,
-        drop_debugger: true,  // 去除debugger
-        // drop_console: true,   // 去除console
+        drop_debugger: isDropDebugger,  // 去除debugger
+        drop_console: isDropConsole,   // 去除console
         // Disabled because of an issue with Uglify breaking seemingly valid code:
         // https://github.com/facebookincubator/create-react-app/issues/2376
         // Pending further investigation:
@@ -508,12 +569,24 @@ module.exports = {
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    // 相对于单页应用-修改
+    /**
+     * 抽取vendor包(采用了和vue-cli相同的方案):
+     *  1.想要多入口,js、css文件的hash采用[chunkhash]才能保证文件hash不每次都变化;
+     *    [ 一个坑点: 修改js的内容,css文件的hash会跟着变化!
+     *      解决: css文件的hash,既不是[hash]也不是[chunkhash],而是[contenthash] !! 
+     *           js文件仍然采用[chunkhash] !!
+     *           (这可以保证js和css有各自不同的文件hash,而且各自的修改不会相互影响hash值 !!) ]
+     *  2.需要抽取manifest.js,记录模块间依赖关系;
+     *  3.使用HashedModuleIdsPlugin()去改变webpack默认的chunk id命名;
+     */
     new webpack.optimize.CommonsChunkPlugin({
       // name: 'vendor',
       // filename: 'static/js/[name].[chunkhash:8].js',
       name: ['vendor', 'manifest'],
       minChunks: Infinity,
     }),
+    // 使用和顺序无关的模块命名方式
     new webpack.HashedModuleIdsPlugin(),
     // 下面这个common，其实更加适合多页应用时候的打包，spa其实用的很少，也起不到什么作用，反而会分散请求
     // new webpack.optimize.CommonsChunkPlugin({
