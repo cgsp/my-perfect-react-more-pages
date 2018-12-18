@@ -1,0 +1,23 @@
+/*
+ * @Author: John.Guan 
+ * @Date: 2018-11-20 14:32:34 
+ * @Last Modified by: John.Guan
+ * @Last Modified time: 2018-11-23 17:18:18
+ */
+
+/* 入口的scss */
+
+// 手机端重置样式
+// @import "./reset-mobile.scss";
+// pc端重置样式
+@import "./reset-pc.scss";
+// 基础样式
+@import "./base.scss";
+// 通用样式
+@import "./common.scss";
+// 字体图标
+@import "./icon.scss";
+// 覆盖antd的样式
+// @import "./reset-antd.scss"; 
+// 覆盖antd-mobile的样式
+@import "./reset-antd-mobile.scss";

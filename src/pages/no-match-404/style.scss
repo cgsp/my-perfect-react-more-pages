@@ -1,0 +1,22 @@
+.no-match-404 {
+  .img-wrap {
+    min-height: 5.92rem;
+    text-align: center;
+    .img {
+      display: inline-block;
+      height: 5.92rem;
+    }
+  }
+  .btn-wrap {
+    text-align: center;
+    .btn {
+      display: inline-block;
+      padding: .15rem .63rem;
+      font-size: .36rem;
+      color: #C6771F;
+      border-radius: 5px;
+      text-align: center;
+      background-color: #fff;
+    }
+  }
+}

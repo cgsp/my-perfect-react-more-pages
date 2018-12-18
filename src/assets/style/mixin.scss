@@ -1,0 +1,72 @@
+/*
+ * @Author: John.Guan 
+ * @Date: 2018-11-20 14:34:54 
+ * @Last Modified by: John.Guan
+ * @Last Modified time: 2018-11-20 15:29:17
+ */
+
+// 用法1
+// @import "@Assets/style/mixin.scss";
+// .box {
+//   @include no-wrap;
+//   width: 30px;
+//   height: 30px;
+//   border: 1px solid red;
+// }
+// 用法2
+// @import "@Assets/style/mixin.scss";
+// .box {
+//   @include bg-image('./icon_close');
+//   background-size: 50px 50px;
+//   width: 50px;
+//   height: 50px;
+//   background-color: red;
+// }
+// 背景图片
+@mixin bg-image($url) {
+  background-image: url($url + "@2x.png");
+  @media (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3) {
+    background-image: url($url + "@3x.png");
+  }
+}
+
+// 不换行，外加单行省略号
+@mixin no-wrap() {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+// 扩展点击区域
+@mixin extend-click() {
+  position: relative;
+  &:before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+  }
+}
+
+// 1像素边框
+@mixin border-1px($color) {
+  position: relative;
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    border-top: 1px solid $color;
+  }
+}
+
+// 无边框
+@mixin border-none() {
+  &.after {
+    display: none;
+  }
+}

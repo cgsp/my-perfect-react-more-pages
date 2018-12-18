@@ -1,0 +1,35 @@
+.example-enter {
+  opacity: 0.01;
+}
+
+.example-enter.example-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+// 当你点击了hello节点的时候，那么该元素将会被移除，它会首先被添加example-leave,
+// 然后添加example-leave-active这个class
+.example-leave {
+  opacity: 1;
+}
+
+.example-leave.example-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
+
+.example-appear {
+  opacity: 0.01;
+}
+
+.example-appear.example-appear-active {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}
+
+.line {
+  height: 100px;
+  line-height: 100px;
+  border: 1px solid red;
+  margin-bottom: 10px;
+}

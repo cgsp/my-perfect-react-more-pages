@@ -1,0 +1,59 @@
+@import "@Assets/style/mixin.scss";
+.orientation-wrapper {
+  display: none;
+  position: fixed;
+  z-index: 10000000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: #fde6ca;
+  .phone {
+    width: .85rem;
+    height: 1.3rem;
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    margin-top: -.8rem;
+    margin-left: -.425rem;
+    @include bg-image('./phone');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    animation: rotate 2s .3s infinite;
+  }
+  .tip {
+    position: absolute;
+    top: 70%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: .24rem;
+    color: #fff;
+  }
+}
+
+// 横屏时提示用户使用竖屏浏览
+@media all and (orientation: landscape) and (max-width:1200px) {
+  .orientation-wrapper {
+    display: block !important;
+  }
+  html,
+  body {
+    overflow: hidden;
+  }
+}
+
+// 竖屏时提示用户使用竖屏浏览
+@media all and (orientation: portrait) {}
+
+@-webkit-keyframes rotate {
+  0% {
+    -webkit-transform: rotate(-90deg);
+  }
+  50% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(-90deg);
+  }
+}
