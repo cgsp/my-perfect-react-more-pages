@@ -1,3 +1,5 @@
+'use strict'
+
 const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware')
 const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware')
 const ignoredFiles = require('react-dev-utils/ignoredFiles')
@@ -7,8 +9,14 @@ const paths = require('./paths')
 const protocol = process.env.HTTPS === 'true' ? 'https' : 'http'
 const host = process.env.HOST || '0.0.0.0'
 
-module.exports = function(proxy, allowedHost) {
+// 相对于单页应用-新增
+// 启动调试时打开的页面(未指定默认走index)
+const page = process.env.page || ''
+
+module.exports = function (proxy, allowedHost) {
   return {
+    // 相对于单页应用-新增
+    index: page,  // 指定首页位置
     // WebpackDevServer 2.4.3 introduced a security fix that prevents remote
     // websites from potentially accessing local content through DNS rebinding:
     // https://github.com/webpack/webpack-dev-server/issues/887
@@ -25,8 +33,8 @@ module.exports = function(proxy, allowedHost) {
     // So we will disable the host check normally, but enable it if you have
     // specified the `proxy` setting. Finally, we let you override it if you
     // really know what you're doing with a special environment variable.
-    disableHostCheck: true,
-    // !proxy || process.env.DANGEROUSLY_DISABLE_HOST_CHECK === 'true',
+    // disableHostCheck: true,
+    disableHostCheck: !proxy || process.env.DANGEROUSLY_DISABLE_HOST_CHECK === 'true',
     // 解决Invalid Host Header
     //
     // Enable gzip compression of generated files.
@@ -48,7 +56,9 @@ module.exports = function(proxy, allowedHost) {
     // for files like `favicon.ico`, `manifest.json`, and libraries that are
     // for some reason broken when imported through Webpack. If you just want to
     // use an image, put it in `src` and `import` it from JavaScript instead.
-    contentBase: paths.appPublic,
+    // contentBase: paths.appPublic,
+    // 相对于单页应用-修改
+    contentBase: paths.appBuild,
     // By default files from `contentBase` will not trigger a page reload.
     watchContentBase: true,
     // Enable hot reloading server. It will provide /sockjs-node/ endpoint
@@ -77,7 +87,11 @@ module.exports = function(proxy, allowedHost) {
     historyApiFallback: {
       // Paths with dots should still use the history fallback.
       // See https://github.com/facebookincubator/create-react-app/issues/387.
-      disableDotRule: true
+      disableDotRule: true,
+      // 相对于单页应用-修改
+      rewrites: [
+        // { from: /^\/list.html/, to: '/build/list.html' },
+      ],
     },
     public: allowedHost,
     proxy,
