@@ -4,8 +4,8 @@
     2.自动扫描html模版,生成new HtmlWebpackPlugin()配置;
  * @Author: John.Guan 
  * @Date: 2018-12-18 17:08:24 
- * @Last Modified by: John.Guan 
- * @Last Modified time: 2018-12-18 17:08:24 
+ * @Last Modified by: John.Guan
+ * @Last Modified time: 2018-12-18 17:18:24
  */
 
 const fs = require('fs')
@@ -28,7 +28,11 @@ const getFiles = filesPath => {
     filePath = files[i]
     extname = path.extname(filePath) // 扩展名 eg: .html
     basename = path.basename(filePath, extname) // 文件名 eg: index
-    // eg: { coupon: '/src/views/coupon/coupon.js' }
+    // basename:  eg: { coupon: '/src/views/coupon/coupon.js' }
+    // 为了避免views文件夹下面，不同的文件嵌套，里面的js的名称，出现重复，对basename进行处理
+    // basename:  eg: { 'coupon.coupon': '/src/views/coupon/coupon.js' }
+    basename = basename.slice(11, -3)
+    basename = basename.replace(/\//g, '.')
     obj[basename] = path.resolve(appDirectory, filePath)
   }
   return obj
