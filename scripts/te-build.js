@@ -30,6 +30,9 @@ const printHostingInstructions = require('react-dev-utils/printHostingInstructio
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 const printBuildError = require('react-dev-utils/printBuildError');
 
+// 相对于单页应用-新增
+const utils = require('../config/utils');
+
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
@@ -39,9 +42,19 @@ const useYarn = fs.existsSync(paths.yarnLockFile);
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 
+// 相对于单页应用-修改
 // Warn and crash if required files are missing
-if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
-  process.exit(1);
+// if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+//   process.exit(1);
+// }
+// 重写的入口js和html模版检查
+for (let key in utils.entries) {
+  const htmlPath = utils.entries[key]
+  const entryPath = utils.templates[key]
+
+  if (!checkRequiredFiles([htmlPath, entryPath])) {
+    process.exit(1);
+  }
 }
 
 // First, read the current file sizes in build directory.
@@ -149,6 +162,8 @@ function build(previousFileSizes) {
 function copyPublicFolder() {
   fs.copySync(paths.appPublic, paths.appBuild, {
     dereference: true,
-    filter: file => file !== paths.appHtml,
+    // 相对于单页应用-修改
+    // public目录下,哪些需要略过copy.
+    // filter: file => file !== paths.appHtml,
   });
 }
