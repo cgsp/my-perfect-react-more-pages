@@ -1,19 +1,34 @@
 // 兼容性处理，兼容低版本浏览器
 import 'babel-polyfill'
 import 'raf/polyfill'
-import React from 'react'
+import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
-import { AppContainer } from 'react-hot-loader'
-import App from './App'
-import registerServiceWorker from './registerServiceWorker'
+import { hot } from 'react-hot-loader'
+import registerServiceWorker from '../../registerServiceWorker'
 import fastclick from 'fastclick'
 // import vConsole from 'vconsole'
+import { HashRouter as Router } from 'react-router-dom'
+// import { BrowserRouter as Router } from 'react-router-dom'
+import { LocaleProvider } from 'antd'
+import OrientationWrapper from '@Components/orientation-wrapper'
+import zhCN from 'antd/lib/locale-provider/zh_CN'
+import { Provider } from 'mobx-react'
+import moment from 'moment'
+import 'moment/locale/zh-cn'
+import RootRoutes from '@Router'
+import Stores from '@Store'
 
 // 引入一些没办法进行Npm安装的库，和script脚本(如browser.js和rem.js)
 import '@Utils/libraries/browser'
 // rem.js这个最好在index.html的head部位引入，不然加载速度可能没APP的主模块的速度快
 // import '@Utils/libraries/rem-resize'
 import '@Utils/libraries/handle-error-img'
+
+// 引入全局的scss
+import '@Assets/style/index'
+
+// 汉化
+moment.locale('zh-cn')
 
 // 手机端fastclick事件注册
 if ('addEventListener' in document) {
@@ -37,29 +52,28 @@ window.addEventListener('pageshow', function (event) {
   }
 })
 
-
-const root = document.getElementById('root')
-const render = (Component) => {
-  ReactDOM.render(
-    <AppContainer warnings={false}>
-      <Component />
-    </AppContainer>,
-    root,
-  )
+class App extends Component {
+  render() {
+    return [
+      <Provider {...Stores} key='app'>
+        <LocaleProvider locale={zhCN}>
+          <Router>
+            <RootRoutes />
+          </Router>
+        </LocaleProvider>
+      </Provider>,
+      <OrientationWrapper key='orientationWrapper' />
+    ]
+  }
 }
 
-render(App)
+// 热加载
+hot(module)(App)
 
-// 如果有需要热更新的代码的话
-if (module.hot) {
-  module.hot.accept('./App', () => {
-    const NextApp = require('./App').default
-    render(NextApp)
-  })
-}
+ReactDOM.render(<App />, document.getElementById('root'))
 
 registerServiceWorker()
 
 // 用下面这个变量作为环境变量
 // 分别是development,test-production,production
-console.log(process.env.REACT_APP_BUILD_ENV)
+// console.log(process.env.REACT_APP_BUILD_ENV)
