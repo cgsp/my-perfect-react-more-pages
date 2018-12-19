@@ -40,9 +40,22 @@ const createDevServerConfig = require('../config/webpackDevServer.config');
 const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
 
+// 相对于单页应用-新增
+const utils = require('../config/utils');
+
+// 相对于单页应用-修改
 // Warn and crash if required files are missing
-if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
-  process.exit(1);
+// if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+//   process.exit(1);
+// }
+// 重写的入口js和html模版检查
+for (let key in utils.entries) {
+  const htmlPath = utils.entries[key]
+  const entryPath = utils.templates[key]
+
+  if (!checkRequiredFiles([htmlPath, entryPath])) {
+    process.exit(1);
+  }
 }
 
 // Tools like Cloud9 rely on this.
