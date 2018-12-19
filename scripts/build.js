@@ -1,4 +1,3 @@
-// 书签
 'use strict';
 
 // Do this as the first thing so that any code reading it knows the right env.
@@ -7,7 +6,7 @@ process.env.NODE_ENV = 'production';
 // 所有自定义环境变量均以REACT_APP_开头
 process.env.REACT_APP_BUILD_ENV = 'production'
 // 配置静态资源url,最终影响output下的publicPath(开发环境不需要配置).--这个东西相当于homepage，PUBLIC_URL||homepage--有了这个东西，就会覆盖homepage
-process.env.PUBLIC_URL = 'http://static2.pp.ximalaya.com/openapi-admin-web/';
+process.env.PUBLIC_URL = '//s1.xmcdn.com/sr012018/open-promotions/last/build/';
 
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
@@ -30,6 +29,8 @@ const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 const printBuildError = require('react-dev-utils/printBuildError');
+// 相对于单页应用-新增
+const utils = require('../config/utils');
 
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;
@@ -40,9 +41,19 @@ const useYarn = fs.existsSync(paths.yarnLockFile);
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 
+// 相对于单页应用-修改
 // Warn and crash if required files are missing
-if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
-  process.exit(1);
+// if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+//   process.exit(1);
+// }
+// 重写的入口js和html模版检查
+for (let key in utils.entries) {
+  const htmlPath = utils.entries[key]
+  const entryPath = utils.templates[key]
+
+  if (!checkRequiredFiles([htmlPath, entryPath])) {
+    process.exit(1);
+  }
 }
 
 // First, read the current file sizes in build directory.
@@ -150,6 +161,8 @@ function build(previousFileSizes) {
 function copyPublicFolder() {
   fs.copySync(paths.appPublic, paths.appBuild, {
     dereference: true,
-    filter: file => file !== paths.appHtml,
+    // 相对于单页应用-修改
+    // public目录下,哪些需要略过copy.
+    // filter: file => file !== paths.appHtml,
   });
 }
