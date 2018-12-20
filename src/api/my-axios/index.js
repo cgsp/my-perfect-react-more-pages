@@ -67,7 +67,7 @@ function myAxios(options) {
   const method = options.method || 'get'
 
   // 2--url设置
-  const url = options.url || ''
+  const url = options.baseApiUrl + options.url || ''
 
   // 3--params设置
   // 4--allowParamsEmptyString--params中是否允许出现空字符串
@@ -179,6 +179,7 @@ export { myAxios }
  * 使用示范
  */
 // myAxios({
+//   baseApiUrl: 'http://www.baidu.com/',
 //   url: 'ddw-exchange-show/item-data',
 //   method: 'get',
 //   headers: {
