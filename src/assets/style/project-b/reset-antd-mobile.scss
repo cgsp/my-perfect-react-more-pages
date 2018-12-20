@@ -1,0 +1,7 @@
+@media (-webkit-min-device-pixel-ratio: 2),
+not all,
+(min-resolution: 2dppx) {
+  html:not([data-scale]) .am-tab-bar-bar::before {
+    background-color: transparent !important;
+  }
+}
